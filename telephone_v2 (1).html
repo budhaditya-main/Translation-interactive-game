@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Telephone: A Translation Experience</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=Playfair+Display:ital,wght@0,700;1,400;1,700&display=swap');
+
+:root {
+  --bg:       #f7f4ef;
+  --white:    #ffffff;
+  --ink:      #1a1a2e;
+  --ink2:     #3d3d5c;
+  --muted:    #8888aa;
+  --red:      #e05555;
+  --gold:     #e8a030;
+  --teal:     #2ec4b6;
+  --purple:   #7c5cbf;
+  --green:    #3db87a;
+  --blue:     #4a90d9;
+  --pink:     #e0608a;
+  --orange:   #f07840;
+
+  --c1: #fde8d0;  /* Hindi      */
+  --c2: #d0f0e8;  /* Gujarati   */
+  --c3: #e8d0f5;  /* Kannada    */
+  --c4: #d0e8ff;  /* Tamil      */
+  --c5: #fff0d0;  /* Telugu     */
+  --c6: #ffd0d8;  /* Malayalam  */
+  --c7: #d8f0d0;  /* Bengali    */
+  --c8: #e8e0ff;  /* Urdu       */
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── SCREEN SYSTEM ── */
+.screen { display:none; min-height:100vh; flex-direction:column; }
+.screen.active { display:flex; }
+
+/* ══ INTRO ══════════════════════════════════════════════════════════════ */
+#intro {
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* floating language bubbles bg */
+.bubble-bg {
+  position: absolute; inset: 0;
+  pointer-events: none; overflow: hidden;
+}
+.lang-bubble {
+  position: absolute;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800;
+  opacity: 0.12;
+  animation: drift linear infinite;
+}
+@keyframes drift {
+  0%   { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-110vh) rotate(360deg); }
+}
+
+.intro-badge {
+  display: inline-block;
+  background: var(--purple);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  padding: 6px 20px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.intro-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px, 6vw, 72px);
+  color: var(--ink);
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+.intro-title span { color: var(--red); }
+
+.intro-subtitle {
+  font-size: clamp(16px, 2vw, 22px);
+  color: var(--muted);
+  font-style: italic;
+  font-family: 'Playfair Display', serif;
+  margin-bottom: 24px;
+}
+
+.intro-divider {
+  width: 60px; height: 4px;
+  background: linear-gradient(90deg, var(--purple), var(--teal));
+  border-radius: 2px;
+  margin: 0 auto 24px;
+}
+
+.intro-desc {
+  max-width: 520px;
+  font-size: clamp(15px, 1.8vw, 18px);
+  line-height: 1.8;
+  color: var(--ink2);
+  margin-bottom: 8px;
+}
+.intro-desc strong { color: var(--ink); }
+
+.intro-warning {
+  font-size: 14px;
+  color: var(--red);
+  font-style: italic;
+  margin-bottom: 32px;
+  font-weight: 700;
+}
+
+/* language flag row */
+.lang-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+.lang-chip {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 2px solid transparent;
+}
+
+.btn-start {
+  padding: 16px 52px;
+  background: linear-gradient(135deg, var(--purple), #9b6be0);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 8px 30px rgba(124,92,191,0.35);
+  transition: all 0.3s;
+}
+.btn-start:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 40px rgba(124,92,191,0.45);
+}
+
+.intro-theory {
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+/* ══ GAME ════════════════════════════════════════════════════════════════ */
+#game {
+  align-items: center;
+  padding: 0 20px 40px;
+  background: var(--bg);
+}
+
+/* sticky top bar */
+.top-bar {
+  position: sticky; top: 0; z-index: 50;
+  width: 100%;
+  background: rgba(247,244,239,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.top-bar-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  color: var(--ink);
+  font-style: italic;
+  white-space: nowrap;
+}
+
+.progress-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  max-width: 300px;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple), var(--teal));
+  border-radius: 4px;
+  transition: width 0.8s cubic-bezier(.4,0,.2,1);
+  width: 0%;
+}
+
+.stage-count {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* main content */
+.game-content {
+  width: 100%;
+  max-width: 660px;
+  margin: 0 auto;
+  padding-top: 28px;
+}
+
+/* translator card */
+.translator-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: all 0.5s cubic-bezier(.4,0,.2,1);
+}
+.translator-header.show { opacity:1; transform:translateY(0); }
+
+.translator-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+}
+
+.translator-info { flex:1; }
+.translator-lang {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--ink);
+}
+.translator-sub {
+  font-size: 13px;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.translator-step {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  color: #fff;
+}
+
+/* received box */
+.received-box {
+  background: rgba(0,0,0,0.04);
+  border-left: 4px solid rgba(0,0,0,0.1);
+  border-radius: 0 12px 12px 0;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.received-box.show { opacity:1; }
+.received-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.received-text {
+  font-size: 16px;
+  color: var(--ink2);
+  font-style: italic;
+  font-family: 'Playfair Display', serif;
+  line-height: 1.6;
+}
+
+/* loss tag */
+.loss-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff0f0;
+  border: 1.5px solid #ffc5c5;
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--red);
+  margin-bottom: 12px;
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.loss-tag.show { opacity:1; }
+.loss-tag::before { content:'⚠'; font-size:13px; }
+
+/* output card */
+.output-card {
+  border-radius: 20px;
+  padding: 24px 28px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 0.5s cubic-bezier(.4,0,.2,1);
+  border: 2px solid transparent;
+}
+.output-card.show { opacity:1; transform:translateY(0); }
+
+.output-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  opacity: 0.6;
+}
+
+.output-text {
+  font-size: clamp(20px, 3vw, 28px);
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.5;
+  min-height: 60px;
+}
+
+.output-gloss {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--muted);
+  font-style: italic;
+  opacity: 0;
+  transition: opacity 0.5s;
+  border-top: 1px solid rgba(0,0,0,0.06);
+  padding-top: 10px;
+}
+.output-gloss.show { opacity:1; }
+
+/* typing cursor */
+.cursor {
+  display: inline-block;
+  width: 3px; height: 1em;
+  background: currentColor;
+  border-radius: 2px;
+  vertical-align: text-bottom;
+  animation: blink 0.7s step-end infinite;
+  margin-left: 2px;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* next button */
+.next-btn-wrap {
+  opacity: 0;
+  transition: opacity 0.5s;
+  margin-top: 8px;
+}
+.next-btn-wrap.show { opacity:1; }
+
+.btn-next {
+  width: 100%;
+  padding: 16px;
+  background: var(--ink);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-next:hover {
+  background: var(--purple);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(124,92,191,0.3);
+}
+
+/* ══ END ═════════════════════════════════════════════════════════════════ */
+#end {
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+  background: var(--bg);
+}
+
+.end-compare {
+  width: 100%;
+  max-width: 620px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.end-box {
+  border-radius: 18px;
+  padding: 20px;
+  text-align: left;
+}
+.end-box-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.end-box-text {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(14px,1.8vw,18px);
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.end-arrow-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.end-arrow-icon { font-size: 28px; }
+.end-arrow-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--red);
+  text-align: center;
+}
+
+.end-verdict-wrap {
+  background: var(--ink);
+  border-radius: 20px;
+  padding: 28px 36px;
+  max-width: 580px;
+  width: 100%;
+  margin: 16px 0;
+}
+.end-verdict-it {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(22px,3.5vw,38px);
+  color: #fff;
+  margin-bottom: 4px;
+}
+.end-verdict-trans {
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 2px;
+}
+
+.end-reflection {
+  max-width: 540px;
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--ink2);
+  background: var(--white);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin: 16px 0;
+  text-align: left;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+}
+.end-reflection em { color: var(--purple); font-style: italic; }
+
+.end-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  max-width: 580px;
+  margin: 12px 0 24px;
+}
+.end-step-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.btn-again {
+  padding: 16px 48px;
+  background: linear-gradient(135deg, var(--teal), #1aab9e);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 17px;
+  font-weight: 800;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 8px 28px rgba(46,196,182,0.35);
+  transition: all 0.3s;
+}
+.btn-again:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 36px rgba(46,196,182,0.45);
+}
+
+.end-credit {
+  margin-top: 20px;
+  font-size: 12px;
+  color: var(--muted);
+  font-style: italic;
+}
+</style>
+</head>
+<body>
+
+<!-- ══ INTRO ═════════════════════════════════════════════════════════════ -->
+<div id="intro" class="screen active">
+  <div class="bubble-bg" id="bubbleBg"></div>
+
+  <div class="intro-badge">Translation Studies · Interactive Experience</div>
+
+  <div class="intro-title">
+    The <span>Telephone</span>
+  </div>
+  <div class="intro-subtitle">Traduttore, Traditore: Translator, Traitor</div>
+
+  <div class="intro-divider"></div>
+
+  <p class="intro-desc">
+    One sentence. <strong>Eight Indian language translators.</strong><br>
+    Each one doing their absolute best.<br>
+    Watch what happens to the meaning.
+  </p>
+  <p class="intro-warning">⚠ You cannot stop it. That is the point.</p>
+
+  <div class="lang-row">
+    <div class="lang-chip">🇮🇳 Hindi</div>
+    <div class="lang-chip">🇮🇳 Gujarati</div>
+    <div class="lang-chip">🇮🇳 Kannada</div>
+    <div class="lang-chip">🇮🇳 Tamil</div>
+    <div class="lang-chip">🇮🇳 Telugu</div>
+    <div class="lang-chip">🇮🇳 Malayalam</div>
+    <div class="lang-chip">🇮🇳 Bengali</div>
+    <div class="lang-chip">🇮🇳 Urdu</div>
+  </div>
+
+  <button class="btn-start" onclick="beginExperience()">▶ &nbsp; Begin the Experience</button>
+
+  <p class="intro-theory" style="max-width:520px;line-height:1.7;">
+    A prototype for back page element, comprising of the idea of translator-traitor which is just a version and not biasing against translation.
+  </p>
+  <div style="margin-top:16px;background:#fff;border-radius:14px;padding:16px 24px;box-shadow:0 2px 12px rgba(0,0,0,0.07);font-size:13px;color:var(--ink2);line-height:2;text-align:left;max-width:380px;">
+    <strong>Name:</strong> Budhaditya Sanyal<br>
+    <strong>Roll No:</strong> 2333121<br>
+    <strong>Class:</strong> 6BAENG<br>
+    <strong>Course:</strong> Translation: Theory And Practice<br>
+    <strong>Course Code:</strong> BENG633<br>
+    <strong>Date:</strong> 11 March 2026
+  </div>
+</div>
+
+<!-- ══ GAME ═══════════════════════════════════════════════════════════════ -->
+<div id="game" class="screen">
+  <div class="top-bar">
+    <div class="top-bar-title">The Telephone</div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="stage-count" id="stageCount">1 / 8</div>
+  </div>
+
+  <div class="game-content" id="gameContent"></div>
+</div>
+
+<!-- ══ END ════════════════════════════════════════════════════════════════ -->
+<div id="end" class="screen">
+  <div class="intro-badge" style="background:var(--teal)">Betrayal Complete</div>
+
+  <div class="intro-title" style="margin-bottom:4px;">What Just Happened?</div>
+  <div class="intro-subtitle" style="margin-bottom:16px;">The meaning, step by step</div>
+
+  <div class="end-compare">
+    <div class="end-box" style="background:#f0e8ff;border:2px solid #c9b0f0;">
+      <div class="end-box-label" style="color:var(--purple);">🟣 Original</div>
+      <div class="end-box-text" id="endOriginal"></div>
+    </div>
+    <div class="end-arrow-box">
+      <div class="end-arrow-icon">→</div>
+      <div class="end-arrow-label">8<br>TRANS-<br>LATIONS</div>
+    </div>
+    <div class="end-box" style="background:#fff0f0;border:2px solid #ffc5c5;">
+      <div class="end-box-label" style="color:var(--red);">🔴 Final</div>
+      <div class="end-box-text" id="endFinal"></div>
+    </div>
+  </div>
+
+  <div class="end-verdict-wrap">
+    <div class="end-verdict-it">Traduttore, Traditore.</div>
+    <div class="end-verdict-trans">TRANSLATOR · TRAITOR</div>
+  </div>
+
+  <div class="end-steps" id="endSteps"></div>
+
+  <div class="end-reflection" id="endReflection"></div>
+
+  <button class="btn-again" onclick="restart()">↺ &nbsp; Witness Again</button>
+
+  <div class="end-credit">
+    <strong>Budhaditya Sanyal</strong> &nbsp;·&nbsp; Roll No: 2333121 &nbsp;·&nbsp; 6BAENG<br>
+    Course: Translation: Theory And Practice &nbsp;·&nbsp; BENG633 &nbsp;·&nbsp; 11 March 2026
+  </div>
+</div>
+
+<script>
+// ══ DATA ══════════════════════════════════════════════════════════════
+const STAGE_COLORS = [
+  { bg:'#fde8d0', accent:'#e8803a', text:'#7a3a08', avatar:'🟠' },
+  { bg:'#d0f0e8', accent:'#2a9a70', text:'#0a4a30', avatar:'🟢' },
+  { bg:'#e8d0f5', accent:'#8040b0', text:'#3a0870', avatar:'🟣' },
+  { bg:'#d0e8ff', accent:'#3068c0', text:'#082858', avatar:'🔵' },
+  { bg:'#fff0d0', accent:'#c08020', text:'#604008', avatar:'🟡' },
+  { bg:'#ffd0d8', accent:'#c03060', text:'#600820', avatar:'🔴' },
+  { bg:'#d8f0d0', accent:'#2a8840', text:'#0a4018', avatar:'💚' },
+  { bg:'#e8e0ff', accent:'#5040a0', text:'#180858', avatar:'💜' },
+];
+
+const chains = [
+  {
+    original: "The meaning was lost in translation.",
+    stages: [
+      { lang:"Hindi", script:"हिन्दी", city:"Delhi",
+        received:"The meaning was lost in translation.",
+        output:"अनुवाद में अर्थ खो गया।",
+        outputEn:"In translation, meaning got lost.",
+        lost:"Passive becomes active: loss feels sudden" },
+      { lang:"Gujarati", script:"ગુજરાતી", city:"Ahmedabad",
+        received:"In translation, meaning got lost.",
+        output:"ભાષાંતરમાં ભાવ ખોવાઈ ગયો.",
+        outputEn:"In translation, the feeling got lost.",
+        lost:'"Meaning" becomes "feeling": first drift' },
+      { lang:"Kannada", script:"ಕನ್ನಡ", city:"Bengaluru",
+        received:"In translation, the feeling got lost.",
+        output:"ಅನುವಾದದಲ್ಲಿ ಭಾವನೆ ಮರೆಯಾಯಿತು.",
+        outputEn:"In translation, the emotion disappeared.",
+        lost:'"Lost" becomes "disappeared": more dramatic' },
+      { lang:"Tamil", script:"தமிழ்", city:"Chennai",
+        received:"In translation, the emotion disappeared.",
+        output:"மொழிபெயர்ப்பில் உணர்வு மறைந்துவிட்டது.",
+        outputEn:"In translation, the sensation vanished.",
+        lost:'"Emotion" shifts to "sensation": now physical' },
+      { lang:"Telugu", script:"తెలుగు", city:"Hyderabad",
+        received:"In translation, the sensation vanished.",
+        output:"అనువాదంలో స్పర్శ అదృశ్యమైంది.",
+        outputEn:"In translation, the touch vanished.",
+        lost:'"Sensation" becomes "touch": intimate now' },
+      { lang:"Malayalam", script:"മലയാളം", city:"Kochi",
+        received:"In translation, the touch vanished.",
+        output:"വിവർത്തനത്തിൽ സ്പർശം നഷ്ടപ്പെട്ടു.",
+        outputEn:"In translation, the touch was lost forever.",
+        lost:'"Vanished" becomes "lost forever": permanence added' },
+      { lang:"Bengali", script:"বাংলা", city:"Kolkata",
+        received:"In translation, the touch was lost forever.",
+        output:"অনুবাদে স্পর্শ চিরতরে হারিয়ে গেল।",
+        outputEn:"In translation, love was lost forever.",
+        lost:'"Touch" becomes "love": intimate betrayal' },
+      { lang:"Urdu", script:"اردو", city:"Lucknow",
+        received:"In translation, love was lost forever.",
+        output:"ترجمے میں محبت ہمیشہ کے لیے کھو گئی۔",
+        outputEn:"In translation, love was lost: and so was the soul.",
+        lost:'The soul itself enters: what began as academic is now existential' },
+    ],
+    reflection:`What began as <em>"The meaning was lost in translation"</em>: a calm, academic observation: ended as <em>"love was lost, and so was the soul."</em><br><br>Eight translators. Eight acts of care. Eight small betrayals.<br>None of them wrong. All of them traitors.<br><br>This is <em>Traduttore, Traditore.</em>`
+  },
+  {
+    original: "Home is where the heart is.",
+    stages: [
+      { lang:"Hindi", script:"हिन्दी", city:"Varanasi",
+        received:"Home is where the heart is.",
+        output:"घर वही है जहाँ दिल हो।",
+        outputEn:"Home is where the heart resides.",
+        lost:"English idiom becomes literal Hindi" },
+      { lang:"Punjabi", script:"ਪੰਜਾਬੀ", city:"Amritsar",
+        received:"Home is where the heart resides.",
+        output:"ਘਰ ਉਹ ਜਗ੍ਹਾ ਹੈ ਜਿੱਥੇ ਰੂਹ ਵੱਸਦੀ ਹੈ।",
+        outputEn:"Home is where the soul dwells.",
+        lost:'"Heart" becomes "soul": deeper but different' },
+      { lang:"Gujarati", script:"ગુજરાતી", city:"Surat",
+        received:"Home is where the soul dwells.",
+        output:"ઘર એ છે જ્યાં આત્મા વસે.",
+        outputEn:"Home is where the spirit lives.",
+        lost:'"Soul" and "spirit": both close, not identical' },
+      { lang:"Marathi", script:"मराठी", city:"Pune",
+        received:"Home is where the spirit lives.",
+        output:"घर म्हणजे जिथे मन रमते ते ठिकाण.",
+        outputEn:"Home is the place where the mind finds peace.",
+        lost:'"Spirit" becomes "mind": philosophical shift' },
+      { lang:"Kannada", script:"ಕನ್ನಡ", city:"Mysuru",
+        received:"Home is the place where the mind finds peace.",
+        output:"ಮನಸ್ಸು ಶಾಂತಿ ಕಂಡುಕೊಳ್ಳುವ ಜಾಗವೇ ಮನೆ.",
+        outputEn:"The place the mind finds calm is home.",
+        lost:"Word order reverses: home becomes conclusion, not premise" },
+      { lang:"Telugu", script:"తెలుగు", city:"Vijayawada",
+        received:"The place the mind finds calm is home.",
+        output:"మనసు శాంతిని పొందే చోటే ఇల్లు.",
+        outputEn:"Where peace of mind is found: that is a house.",
+        lost:'"Home" (intimate) becomes "house" (structural)' },
+      { lang:"Tamil", script:"தமிழ்", city:"Madurai",
+        received:"Where peace of mind is found: that is a house.",
+        output:"மன அமைதி கிடைக்கும் இடமே வீடு.",
+        outputEn:"A building where mental peace is obtained.",
+        lost:"Becomes clinical: all warmth removed" },
+      { lang:"Bengali", script:"বাংলা", city:"Dhaka",
+        received:"A building where mental peace is obtained.",
+        output:"যেখানে মানসিক শান্তি পাওয়া যায় সেটা একটি কাঠামো।",
+        outputEn:"A structure where psychological rest can be obtained.",
+        lost:'Home is now a "structure": the heart is gone' },
+    ],
+    reflection:`<em>"Home is where the heart is"</em>: warm, universal, human.<br><br>After eight translations it became <em>"A structure where psychological rest can be obtained."</em><br><br>The heart was translated out of existence. This is what we mean by <em>betrayal.</em>`
+  }
+];
+
+// ══ STATE ════════════════════════════════════════════════════════════
+let currentChain, currentStage;
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ── FLOATING BUBBLES ────────────────────────────────────────────────
+const bubbleWords = ["अनुवाद","ભાષા","ಅನುವಾದ","翻译","ترجمة","অনুবাদ","ਅਨੁਵਾਦ","అనువాదం","Translate"];
+const bubbleColors = ["#e8a030","#2ec4b6","#7c5cbf","#e05555","#3db87a","#4a90d9","#e0608a"];
+const bbg = document.getElementById('bubbleBg');
+bubbleWords.forEach((w,i) => {
+  const b = document.createElement('div');
+  b.className = 'lang-bubble';
+  b.textContent = w;
+  const size = 80 + Math.random()*80;
+  b.style.cssText = `
+    width:${size}px; height:${size}px;
+    left:${Math.random()*90}%;
+    bottom:${-size}px;
+    font-size:${size*0.25}px;
+    background:${bubbleColors[i%bubbleColors.length]};
+    color:#fff;
+    animation-duration:${12+Math.random()*10}s;
+    animation-delay:${Math.random()*8}s;
+  `;
+  bbg.appendChild(b);
+});
+
+// ══ EXPERIENCE LOGIC ══════════════════════════════════════════════════
+function beginExperience() {
+  currentChain = chains[Math.floor(Math.random()*chains.length)];
+  currentStage = -1;
+  showScreen('game');
+  setTimeout(() => nextStage(), 200);
+}
+
+function nextStage() {
+  currentStage++;
+  const stages = currentChain.stages;
+  if(currentStage >= stages.length) { showEnd(); return; }
+
+  const stage  = stages[currentStage];
+  const color  = STAGE_COLORS[currentStage];
+  const total  = stages.length;
+
+  // progress
+  document.getElementById('progressFill').style.width = ((currentStage+1)/total*100)+'%';
+  document.getElementById('stageCount').textContent = `${currentStage+1} / ${total}`;
+
+  // build card HTML
+  const content = document.getElementById('gameContent');
+  content.innerHTML = '';
+
+  // translator header
+  const header = document.createElement('div');
+  header.className = 'translator-header';
+  header.innerHTML = `
+    <div class="translator-avatar" style="background:${color.bg}">${color.avatar}</div>
+    <div class="translator-info">
+      <div class="translator-lang">${stage.lang} <span style="font-size:14px;color:var(--muted);font-weight:600;">: ${stage.script}</span></div>
+      <div class="translator-sub">Translator ${currentStage+1} · ${stage.city}</div>
+    </div>
+    <div class="translator-step" style="background:${color.accent}">Step ${currentStage+1}</div>`;
+  content.appendChild(header);
+  setTimeout(() => header.classList.add('show'), 100);
+
+  // received box (not first)
+  if(currentStage > 0) {
+    const recBox = document.createElement('div');
+    recBox.className = 'received-box';
+    recBox.innerHTML = `
+      <div class="received-label">Received from previous translator</div>
+      <div class="received-text">"${stage.received}"</div>`;
+    content.appendChild(recBox);
+    setTimeout(() => recBox.classList.add('show'), 300);
+
+    // loss tag
+    const lossTag = document.createElement('div');
+    lossTag.className = 'loss-tag';
+    lossTag.textContent = stage.lost;
+    content.appendChild(lossTag);
+    setTimeout(() => lossTag.classList.add('show'), 500);
+  }
+
+  // output card
+  const outCard = document.createElement('div');
+  outCard.className = 'output-card';
+  outCard.style.background = color.bg;
+  outCard.style.borderColor = color.accent + '55';
+
+  const outLabel = document.createElement('div');
+  outLabel.className = 'output-label';
+  outLabel.style.color = color.accent;
+  outLabel.textContent = currentStage === 0 ? '📝 Original Sentence' : `🌐 Translated into ${stage.lang}`;
+  outCard.appendChild(outLabel);
+
+  const outText = document.createElement('div');
+  outText.className = 'output-text';
+  outText.style.color = color.text;
+  outCard.appendChild(outText);
+
+  const outGloss = document.createElement('div');
+  outGloss.className = 'output-gloss';
+  outGloss.style.color = color.accent;
+  outCard.appendChild(outGloss);
+
+  content.appendChild(outCard);
+  setTimeout(() => outCard.classList.add('show'), currentStage === 0 ? 200 : 700);
+
+  // next button
+  const nextWrap = document.createElement('div');
+  nextWrap.className = 'next-btn-wrap';
+  nextWrap.innerHTML = `<button class="btn-next" onclick="nextStage()">
+    ${currentStage === total-1 ? '🏁 See the Verdict' : 'Next Translator →'}
+  </button>`;
+  content.appendChild(nextWrap);
+
+  // type text
+  const textToType = currentStage === 0 ? `"${stage.received}"` : stage.output;
+  const glossText  = currentStage === 0 ? `(English)` : `"${stage.outputEn}"`;
+
+  const typeDelay = currentStage === 0 ? 400 : 900;
+  setTimeout(() => {
+    typeText(outText, textToType, () => {
+      outGloss.textContent = glossText;
+      setTimeout(() => outGloss.classList.add('show'), 200);
+      setTimeout(() => nextWrap.classList.add('show'), 600);
+      // scroll into view
+      setTimeout(() => nextWrap.scrollIntoView({ behavior:'smooth', block:'nearest' }), 700);
+    });
+  }, typeDelay);
+}
+
+function typeText(el, text, onDone) {
+  el.innerHTML = '<span class="cursor">|</span>';
+  let i = 0;
+  const speed = text.length > 50 ? 25 : 35;
+  function tick() {
+    if(i <= text.length) {
+      el.innerHTML = text.slice(0,i) + '<span class="cursor">|</span>';
+      i++;
+      setTimeout(tick, speed);
+    } else {
+      el.innerHTML = text;
+      if(onDone) onDone();
+    }
+  }
+  tick();
+}
+
+function showEnd() {
+  const stages = currentChain.stages;
+  document.getElementById('endOriginal').textContent = `"${currentChain.original}"`;
+  document.getElementById('endFinal').textContent = `"${stages[stages.length-1].outputEn}"`;
+  document.getElementById('endReflection').innerHTML = currentChain.reflection;
+
+  // step chips
+  const stepsEl = document.getElementById('endSteps');
+  stepsEl.innerHTML = '';
+  stages.forEach((s,i) => {
+    const c = STAGE_COLORS[i];
+    const chip = document.createElement('div');
+    chip.className = 'end-step-chip';
+    chip.style.background = c.accent;
+    chip.textContent = `${c.avatar} ${s.lang}`;
+    stepsEl.appendChild(chip);
+  });
+
+  showScreen('end');
+}
+
+function restart() { beginExperience(); }
+</script>
+</body>
+</html>
